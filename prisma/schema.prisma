@@ -1,0 +1,247 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+
+enum BotStatus { CREATING IDLE DEPLOYING ONLINE OFFLINE CRASHED STOPPING STARTING DELETED }
+enum BotLanguage { NODEJS PYTHON JAVA GO RUST PHP DOTNET UNKNOWN }
+enum DeploymentStatus { QUEUED BUILDING DEPLOYING SUCCESS FAILED CANCELED ROLLED_BACK }
+enum TeamRole { OWNER ADMIN DEVELOPER VIEWER BILLING }
+enum AuditAction { USER_LOGIN BOT_CREATE BOT_UPDATE BOT_DELETE BOT_START BOT_STOP BOT_RESTART DEPLOY_CREATE TEAM_INVITE TEAM_UPDATE ENV_UPDATE BILLING_UPDATE }
+enum NotificationType { INFO SUCCESS WARNING ERROR BILLING DEPLOYMENT SECURITY }
+enum Plan { FREE STARTER PRO SCALE ENTERPRISE }
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  plan          Plan      @default(FREE)
+  accounts      Account[]
+  sessions      Session[]
+  teams         TeamMember[]
+  ownedTeams    Team[]    @relation("TeamOwner")
+  bots          Bot[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  @@index([email])
+  @@index([deletedAt])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  ownerId     String
+  owner       User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members     TeamMember[]
+  bots        Bot[]
+  auditLogs   AuditLog[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+  @@index([ownerId])
+  @@index([slug])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      TeamRole @default(VIEWER)
+  invitedBy String?
+  joinedAt  DateTime @default(now())
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+model Bot {
+  id              String        @id @default(cuid())
+  name            String
+  slug            String
+  avatarUrl       String?
+  description     String?
+  ownerId         String
+  teamId          String?
+  language        BotLanguage   @default(UNKNOWN)
+  status          BotStatus     @default(CREATING)
+  repositoryUrl   String?
+  containerId     String?
+  imageName       String?
+  entrypoint      String?
+  runtimeVersion  String?
+  cpuLimit        Float         @default(0.5)
+  memoryMb        Int           @default(512)
+  diskMb          Int           @default(1024)
+  autoRestart     Boolean       @default(true)
+  owner           User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  team            Team?         @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  config          BotConfig?
+  env             EnvVariable[]
+  deployments     Deployment[]
+  metrics         BotMetrics[]
+  logs            BotLog[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+  @@unique([ownerId, slug])
+  @@index([teamId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model BotConfig {
+  id              String   @id @default(cuid())
+  botId           String   @unique
+  installCommand  String?
+  buildCommand    String?
+  startCommand    String?
+  dockerfilePath  String?
+  workingDir      String   @default("/")
+  healthcheckPath String?
+  port            Int?
+  bot             Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model EnvVariable {
+  id        String   @id @default(cuid())
+  botId     String
+  key       String
+  value     String   @db.Text
+  encrypted Boolean  @default(true)
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([botId, key])
+}
+
+model Deployment {
+  id          String           @id @default(cuid())
+  botId       String
+  status      DeploymentStatus @default(QUEUED)
+  sourceType  String           @default("upload")
+  artifactKey String?
+  commitSha   String?
+  logs        String?          @db.Text
+  error       String?          @db.Text
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  bot         Bot              @relation(fields: [botId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  @@index([botId, createdAt])
+  @@index([status])
+}
+
+model BotMetrics {
+  id        String   @id @default(cuid())
+  botId     String
+  cpu       Float
+  memoryMb  Float
+  diskMb    Float?
+  networkRx Float?
+  networkTx Float?
+  pingMs    Int?
+  uptimeSec Int?
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@index([botId, createdAt])
+}
+
+model BotLog {
+  id        String   @id @default(cuid())
+  botId     String
+  level     String   @default("info")
+  message   String   @db.Text
+  source    String   @default("container")
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@index([botId, createdAt])
+  @@index([level])
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  action    AuditAction
+  userId    String?
+  teamId    String?
+  botId     String?
+  ip        String?
+  userAgent String?
+  metadata  Json?
+  user      User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  team      Team?       @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  createdAt DateTime    @default(now())
+  @@index([userId, createdAt])
+  @@index([teamId, createdAt])
+  @@index([botId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType @default(INFO)
+  title     String
+  body      String
+  readAt    DateTime?
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+  @@index([userId, readAt])
+}
+
+model Template {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String
+  language    BotLanguage
+  repository  String?
+  icon        String?
+  featured    Boolean     @default(false)
+  config      Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+  @@index([language])
+  @@index([featured])
+}

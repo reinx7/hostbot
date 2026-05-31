@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 232 33% 6%;
+  --foreground: 220 23% 97%;
+  --card: 235 28% 9%;
+  --muted: 231 16% 18%;
+  --border: 236 22% 20%;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(99,102,241,.16), transparent 30%),
+    radial-gradient(circle at 85% 0%, rgba(168,85,247,.18), transparent 28%),
+    hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.glass {
+  background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 20px 80px rgba(0,0,0,.28);
+  backdrop-filter: blur(18px);
+}
+
+.neon-border { position: relative; border-radius: 1.5rem; }
+.neon-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(90deg, rgba(99,102,241,.8), rgba(168,85,247,.8), rgba(99,102,241,.8));
+  background-size: 200% 100%;
+  animation: border-flow 5s linear infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Pure CSS emoji system */
+.css-emoji { --a:#6366F1; --b:#A855F7; --c:#fff; display:inline-grid; place-items:center; width:1.35em; height:1.35em; border-radius:38%; background:linear-gradient(135deg,var(--a),var(--b)); box-shadow:0 0 20px color-mix(in srgb,var(--a),transparent 55%); position:relative; vertical-align:-.22em; margin-right:.35rem; }
+.css-emoji::before,.css-emoji::after{ content:""; position:absolute; }
+.emoji-fire::before{ width:.55em;height:.8em;border-radius:70% 30% 70% 30%;background:linear-gradient(#fff3a3,#ff7a18 55%,#ef4444); transform:rotate(15deg); }
+.emoji-check::before{ width:.75em;height:.42em;border-left:.16em solid white;border-bottom:.16em solid white; transform:rotate(-45deg) translate(.04em,-.05em); }
+.emoji-cross::before,.emoji-cross::after{ width:.85em;height:.15em;background:white;border-radius:9px; } .emoji-cross::before{transform:rotate(45deg)} .emoji-cross::after{transform:rotate(-45deg)}
+.emoji-lightning::before{ border-left:.25em solid transparent;border-right:.1em solid transparent;border-top:.72em solid #facc15; transform:skewX(-14deg); filter:drop-shadow(0 0 6px #facc15); }
+.emoji-tools::before{ width:.84em;height:.14em;background:#e5e7eb;border-radius:9px;transform:rotate(-38deg)} .emoji-tools::after{ width:.36em;height:.36em;border:.12em solid #e5e7eb;border-radius:50%;right:.15em;top:.17em; }
+.emoji-chart::before{ width:.85em;height:.65em;border-left:.11em solid white;border-bottom:.11em solid white; } .emoji-chart::after{ width:.65em;height:.42em;border-left:.12em solid #22c55e;border-bottom:.12em solid #22c55e;transform:rotate(-15deg); }
+.emoji-refresh::before{ width:.75em;height:.75em;border:.13em solid white;border-right-color:transparent;border-radius:50%; } .emoji-refresh::after{ right:.22em;top:.18em;border-left:.25em solid white;border-top:.15em solid transparent;border-bottom:.15em solid transparent; }
+.emoji-warning::before{ border-left:.45em solid transparent;border-right:.45em solid transparent;border-bottom:.85em solid #f59e0b; } .emoji-warning::after{ width:.11em;height:.42em;background:#111827;top:.38em;box-shadow:0 .32em 0 #111827;border-radius:9px; }
+.emoji-bot::before{ width:.9em;height:.62em;background:#e5e7eb;border-radius:.18em;box-shadow:inset .22em .2em 0 #111827,inset -.22em .2em 0 #111827; } .emoji-bot::after{ width:.1em;height:.25em;background:#e5e7eb;top:.1em; }
+.emoji-server::before{ width:.9em;height:.65em;border-radius:.12em;background:repeating-linear-gradient(to bottom,#e5e7eb 0 .18em,#94a3b8 .18em .22em); } .emoji-server::after{ width:.12em;height:.12em;border-radius:50%;background:#22c55e;right:.28em;bottom:.33em; }
+.emoji-rocket::before{ width:.42em;height:.88em;border-radius:50% 50% 35% 35%;background:linear-gradient(#fff,#c4b5fd);transform:rotate(35deg)} .emoji-rocket::after{ width:.28em;height:.38em;border-radius:50%;background:#fb923c;left:.22em;bottom:.12em;transform:rotate(35deg); }
+.emoji-shield::before{ width:.78em;height:.9em;background:linear-gradient(#fff,#93c5fd);clip-path:polygon(50% 0,88% 14%,78% 75%,50% 100%,22% 75%,12% 14%); }
+.emoji-lock::before{ width:.75em;height:.55em;background:white;border-radius:.12em;bottom:.22em } .emoji-lock::after{ width:.48em;height:.42em;border:.12em solid white;border-bottom:0;border-radius:.3em .3em 0 0;top:.21em; }
+.emoji-key::before{ width:.35em;height:.35em;border:.12em solid white;border-radius:50%;left:.23em } .emoji-key::after{ width:.58em;height:.12em;background:white;right:.2em;box-shadow:.22em .14em 0 -.02em white; }
+.emoji-code::before{ content:"</>";font-size:.62em;font-weight:800;color:white; }
+.emoji-db::before{ width:.82em;height:.72em;border-radius:50%/18%;background:linear-gradient(#fff,#c7d2fe);box-shadow:0 -.18em 0 rgba(255,255,255,.55) inset; }
+.emoji-cloud::before{ width:.9em;height:.45em;background:white;border-radius:.5em;bottom:.34em;box-shadow:-.16em -.12em 0 .04em white,.18em -.18em 0 .07em white; }
+.emoji-upload::before{ width:.68em;height:.12em;background:white;bottom:.32em } .emoji-upload::after{ border-left:.28em solid transparent;border-right:.28em solid transparent;border-bottom:.4em solid white;top:.28em; }
+.emoji-download::before{ width:.68em;height:.12em;background:white;bottom:.29em } .emoji-download::after{ border-left:.28em solid transparent;border-right:.28em solid transparent;border-top:.4em solid white;top:.36em; }
+.emoji-cpu::before{ width:.66em;height:.66em;border:.13em solid white;border-radius:.12em;box-shadow:.34em 0 0 -.26em white,-.34em 0 0 -.26em white,0 .34em 0 -.26em white,0 -.34em 0 -.26em white; }
+.emoji-ram::before{ width:.88em;height:.44em;background:white;border-radius:.08em;box-shadow:inset .18em 0 0 #94a3b8,inset .36em 0 0 white,inset .54em 0 0 #94a3b8; }
+.emoji-terminal::before{ width:.86em;height:.62em;border:.08em solid white;border-radius:.1em; } .emoji-terminal::after{ content:">_";font-size:.52em;color:white;font-weight:900;left:.28em;top:.34em; }
+.emoji-team::before{ width:.32em;height:.32em;border-radius:50%;background:white;box-shadow:-.28em .22em 0 -.04em white,.28em .22em 0 -.04em white,0 .38em 0 .16em white; }
+.emoji-money::before{ content:"$";font-weight:900;color:#052e16;background:#86efac;border-radius:50%;width:.82em;height:.82em;text-align:center;line-height:.82em; }
+.emoji-star::before{ width:.9em;height:.9em;background:#fde047;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 56%,79% 91%,50% 70%,21% 91%,32% 56%,2% 35%,39% 35%); }
+.emoji-bell::before{ width:.68em;height:.72em;background:white;border-radius:.34em .34em .14em .14em; } .emoji-bell::after{ width:.22em;height:.12em;background:white;border-radius:50%;bottom:.2em; }
+.emoji-globe::before{ width:.78em;height:.78em;border:.1em solid white;border-radius:50%; } .emoji-globe::after{ width:.1em;height:.78em;background:white;box-shadow:.22em 0 0 -.03em white,-.22em 0 0 -.03em white; }
+.emoji-folder::before{ width:.88em;height:.58em;background:#fde68a;border-radius:.08em;bottom:.27em; } .emoji-folder::after{ width:.38em;height:.16em;background:#facc15;left:.24em;top:.34em;border-radius:.06em .06em 0 0; }
+.emoji-settings::before{ content:"⚙";color:white;font-size:.9em;line-height:1; }
+.emoji-clock::before{ width:.78em;height:.78em;border:.1em solid white;border-radius:50%; } .emoji-clock::after{ width:.1em;height:.32em;background:white;top:.34em;box-shadow:.16em .18em 0 -.02em white;transform-origin:bottom; }

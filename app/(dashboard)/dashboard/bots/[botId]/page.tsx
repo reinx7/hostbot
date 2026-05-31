@@ -1,0 +1,6 @@
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
+import { BotControls } from "@/components/bots/bot-controls";
+import { BotConsole } from "@/components/bots/bot-console";
+import { MetricsCards } from "@/components/bots/metrics-cards";
+export default async function BotPage({params}:{params:Promise<{botId:string}>}){ const {botId}=await params; const bot=await prisma.bot.findUnique({where:{id:botId},include:{metrics:{take:1,orderBy:{createdAt:'desc'}},deployments:{take:5,orderBy:{createdAt:'desc'}}}}); if(!bot) notFound(); return <div><div className="flex flex-col justify-between gap-4 md:flex-row md:items-center"><div><h1 className="text-3xl font-bold">{bot.name}</h1><p className="text-white/60">{bot.language} · {bot.status}</p></div><BotControls botId={bot.id}/></div><MetricsCards latest={bot.metrics[0]}/><div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]"><BotConsole botId={bot.id}/><div className="glass rounded-2xl p-6"><h2 className="font-semibold">Deploys recentes</h2><div className="mt-4 space-y-3">{bot.deployments.map(d=><div key={d.id} className="rounded-xl bg-white/[.04] p-3 text-sm"><b>{d.status}</b><p className="text-white/50">{d.createdAt.toLocaleString('pt-BR')}</p></div>)}</div></div></div></div> }

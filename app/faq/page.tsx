@@ -1,0 +1,2 @@
+import { Card, CardContent } from "@/components/ui/card";
+export default function Page(){ return <div><h1 className="text-3xl font-bold">Faq</h1><Card className="mt-6"><CardContent className="p-8"><span className="css-emoji emoji-tools text-4xl"/><p className="mt-4 text-white/60">Módulo faq pronto para evolução: filtros, permissões, billing real, documentação e administração.</p></CardContent></Card></div> }

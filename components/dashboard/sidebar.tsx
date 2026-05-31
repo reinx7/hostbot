@@ -1,0 +1,4 @@
+import Link from "next/link";
+import { Bot, CreditCard, LayoutDashboard, Settings, Users, BookOpen, Boxes } from "lucide-react";
+const items = [[LayoutDashboard,"Dashboard","/dashboard"],[Bot,"Bots","/dashboard/bots"],[Boxes,"Templates","/templates"],[Users,"Times","/teams"],[CreditCard,"Billing","/billing"],[Settings,"Configurações","/settings"],[BookOpen,"Docs","/docs"]] as const;
+export function Sidebar(){return <aside className="sticky top-0 hidden h-screen border-r border-white/10 bg-black/20 p-5 backdrop-blur-xl md:block"><Link href="/" className="flex items-center gap-3 text-xl font-bold"><span className="css-emoji emoji-bot"/>HostBot</Link><nav className="mt-10 grid gap-2">{items.map(([Icon,label,href])=><Link className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/65 transition hover:bg-white/[.06] hover:text-white" key={href} href={href}><Icon size={18}/>{label}</Link>)}</nav></aside>}

@@ -1,0 +1,2 @@
+import { useEffect, useRef, useState } from "react";
+export function useReconnectWebSocket(url:string){ const [messages,setMessages]=useState<string[]>([]); const ws=useRef<WebSocket|null>(null); useEffect(()=>{ let closed=false; let timer:ReturnType<typeof setTimeout>; const connect=()=>{ ws.current=new WebSocket(url); ws.current.onmessage=e=>setMessages(m=>[...m,String(e.data)]); ws.current.onclose=()=>{ if(!closed) timer=setTimeout(connect,1500); };}; connect(); return()=>{closed=true; clearTimeout(timer); ws.current?.close();};},[url]); return messages; }

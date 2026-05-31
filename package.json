@@ -45,6 +45,7 @@
     "lucide-react": "latest",
     "next": "15.5.0",
     "next-auth": "latest",
+    "nodemailer": "latest",
     "react": "latest",
     "react-dom": "latest",
     "react-dropzone": "latest",
